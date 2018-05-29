@@ -1,0 +1,31 @@
+{
+    "name": "mts88/mongogrid",
+    "description": "GridFS of MongoDB for Laravel",
+    "version": "1.0.0",
+    "require": {
+        "mongodb/mongodb": "^1.0.0",
+        "ramsey/uuid": "^3.7.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Francesca Motisi",
+            "email": "fsca.motisi@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Mts88\\MongoGrid\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mts88\\MongoGrid\\Providers\\MongoGridServiceProvider"
+            ],
+            "aliases": {
+                "MongoGrid": "Mts88\\MongoGrid\\Facades\\MongoGrid"
+            }
+        }
+    }
+}
