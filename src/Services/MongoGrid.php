@@ -151,6 +151,8 @@ class MongoGrid implements MongoGridFactory {
         } else {
             throw new \Exception('Invalid $source parameter: must be string or an instance of \MongoDB\BSON\ObjectId.');
         }
+
+        return null;
     }
 
     /**
@@ -169,6 +171,8 @@ class MongoGrid implements MongoGridFactory {
         } else {
             throw new \Exception('Invalid $source parameter: must be string or an instance of \MongoDB\BSON\ObjectId.');
         }
+
+        return null;
     }
 
     /**
@@ -196,6 +200,7 @@ class MongoGrid implements MongoGridFactory {
             \Log::error("RuntimeException: " . $e->getMessage());
         }
 
+        return null;
     }
 
     /**
@@ -222,6 +227,9 @@ class MongoGrid implements MongoGridFactory {
         } catch( \MongoDB\Exception\RuntimeException $e ) {
             \Log::error("RuntimeException: " . $e->getMessage());
         }
+        
+        return null;
+
     }
 
     /**
@@ -236,15 +244,17 @@ class MongoGrid implements MongoGridFactory {
      */
     public function download( $source, string $path, $revision = NULL ) {
         if( $source instanceof \MongoDB\BSON\ObjectId ) {
-            $this->downloadFileStreamById($source, $path);
+            return $this->downloadFileStreamById($source, $path);
 
         } elseif( is_string($source) ) {
 
-            $this->downloadFileStreamByName($source, $path, $revision);
+            return $this->downloadFileStreamByName($source, $path, $revision);
 
         } else {
             throw new \Exception('Invalid $source parameter: must be string or an instance of \MongoDB\BSON\ObjectId.');
         }
+
+        return null;
     }
 
     /**
@@ -294,15 +304,18 @@ class MongoGrid implements MongoGridFactory {
      * Drop entire collection of a selected GridFS
      *
      * @method drop
-     * @return void
+     * @return bool
      * @throw \MongoDB\GridFS\Exception\RuntimeException
      */
     public function drop() {
         try {
             $this->bucket->drop();
+            return true;
         } catch (\MongoDB\Driver\Exception\RuntimeException $e) {
             \Log::error("RuntimeException: " . $e->getMessage());
         }
+
+        return false;
     }
 
     /**
@@ -310,13 +323,13 @@ class MongoGrid implements MongoGridFactory {
      *
      * @method incrementDownload
      * @param  MongoDBBSONObjectId $_id ObjectId of Document
-     * @return void
+     * @return bool
      */
     public function incrementDownload( \MongoDB\BSON\ObjectId $_id ) {
         try {
             $collection = $this->getFilesCollection();
             $collection->updateOne(['_id' => $_id], ['$inc' => [ 'metadata.downloads' => 1]]);
-
+            return true;
         } catch (\MongoDB\GridFS\Exception\FileNotFoundException $e) {
             \Log::error("FileNotFoundException: " . $e->getMessage());
         } catch (\MongoDB\Driver\Exception\RuntimeException $e) {
@@ -324,6 +337,8 @@ class MongoGrid implements MongoGridFactory {
         } catch ( \MongoDB\Exception\UnsupportedException $e) {
             \Log::error("RuntimeException: " . $e->getMessage());
         }
+
+        return false;
     }
 
     /**
@@ -375,10 +390,17 @@ class MongoGrid implements MongoGridFactory {
     public function getFilesCollection() {
         return $this->bucket->getFilesCollection();
     }
-	
-public function validObjectId( $id ) {
-	return preg_match('/^[0-9a-f]{24}$/i', $id) ? true : false;
-}
+    
+    /**
+     * Check if $id is a valid objectId form
+     *
+     * @method validObjectId
+     * @param  String $_id ObjectId of Document
+     * @return bool            True if $id is valid or not.
+     */
+    public function validObjectId( $_id ) {
+        return preg_match('/^[0-9a-f]{24}$/i', $_id) ? true : false;
+    }
 
     /**
      * Set GridFS bucket
@@ -405,20 +427,20 @@ public function validObjectId( $id ) {
      *
      * @method getFileStreamById
      * @param  MongoDBBSONObjectId $fileId   ObjectId of file
-     * @return resource                      Readable stream of file
+     * @return resource|null                      Readable stream of file
      * @throw \MongoDB\GridFS\Exception\FileNotFoundException
      * @throw \MongoDB\GridFS\Exception\RuntimeException
      */
     private function getFileStreamById( \MongoDB\BSON\ObjectId $fileId ) {
         try {
-            $stream = $this->bucket->openDownloadStream($fileId);
+            return $this->bucket->openDownloadStream($fileId);
         } catch (\MongoDB\GridFS\Exception\FileNotFoundException $e) {
             \Log::error("FileNotFoundException: " . $e->getMessage());
         } catch (\MongoDB\Driver\Exception\RuntimeException $e) {
             \Log::error("RuntimeException: " . $e->getMessage());
         }
 
-        return $stream;
+        return null;
     }
 
     /**
@@ -427,7 +449,7 @@ public function validObjectId( $id ) {
      * @method getFileStreamByName
      * @param  string             $fileName Name of file
      * @param  string|null        $revision Revision of file
-     * @return resource                     Readable stream of file
+     * @return resource|null                     Readable stream of file
      * @throw \MongoDB\GridFS\Exception\FileNotFoundException
      * @throw \MongoDB\GridFS\Exception\RuntimeException
      */
@@ -438,14 +460,14 @@ public function validObjectId( $id ) {
         }
 
         try {
-            $stream = $this->bucket->openDownloadStreamByName( $fileName, ['revision' => $revision] );
+            return $this->bucket->openDownloadStreamByName( $fileName, ['revision' => $revision] );
         } catch (\MongoDB\GridFS\Exception\FileNotFoundException $e) {
             \Log::error("FileNotFoundException: " . $e->getMessage());
         } catch (\MongoDB\Driver\Exception\RuntimeException $e) {
             \Log::error("RuntimeException: " . $e->getMessage());
         }
 
-        return $stream;
+        return null;
 
     }
 
@@ -473,8 +495,6 @@ public function validObjectId( $id ) {
             $destination = fopen($destination, 'w+b');
 
             $this->bucket->downloadToStreamByName( $fileName, $destination, ['revision' => $revision] );
-
-            $obj = $this->findOne(['filename' => $fileName], ['revision' => $revision ]);
 
             if( $this->config['add_meta'] ) {
                 $this->incrementDownload($obj->_id);
