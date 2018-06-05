@@ -375,6 +375,10 @@ class MongoGrid implements MongoGridFactory {
     public function getFilesCollection() {
         return $this->bucket->getFilesCollection();
     }
+	
+public function validObjectId( $id ) {
+	return preg_match('/^[0-9a-f]{24}$/i', $id) ? true : false;
+}
 
     /**
      * Set GridFS bucket
