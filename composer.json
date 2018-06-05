@@ -1,7 +1,7 @@
 {
     "name": "mts88/mongogrid",
     "description": "GridFS of MongoDB for Laravel",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "require": {
         "mongodb/mongodb": "^1.0.0",
         "ramsey/uuid": "^3.7.0"
