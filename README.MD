@@ -1,6 +1,10 @@
 
 # Laravel MongoDB GridFS
 
+[![Latest Stable Version](https://poser.pugx.org/mts88/mongogrid/v/stable)](https://packagist.org/packages/mts88/mongogrid)
+[![Total Downloads](https://poser.pugx.org/mts88/mongogrid/downloads)](https://packagist.org/packages/mts88/mongogrid)
+[![License](https://poser.pugx.org/mts88/mongogrid/license)](https://packagist.org/packages/mts88/mongogrid)
+
 A library wants to help the use of GridFS of MongoDB for Laravel 5. _This library extends the original [MongoDB GridFS Bucket for PHP](https://docs.mongodb.com/php-library/current/reference/class/MongoDBGridFSBucket/), so many methods are exactly the same and others are simplified for the use._
 
 #### Note
