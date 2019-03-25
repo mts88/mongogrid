@@ -26,10 +26,16 @@ class MongoClient {
      */
     private $options;
 
+    /**
+     * In use default config
+     */
+    private $defaultConfig;
+
     public function __construct() {
 
         $this->config = config('gridfs.db_config');
         $this->connectDB()->selectDatabase();
+        $this->defaultConfig = true;
 
     }
 
@@ -60,15 +66,66 @@ class MongoClient {
      * Connect to MongoDB
      */
     private function connectDB() {
+        
+        // Config from config/database.php
+        if(!is_array($this->config)){
+            $connection = $this->config;
+            $this->config = config('database.connections.' . $connection);
+            $this->defaultConfig = false;
+        }
+
+        if($this->hasDsnString($this->config)){
+            $this->connectWithDsnUrl();
+        } else {
+            $this->connectWithHost();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if exists dsn url and if is valid
+     * 
+     * @input array $config Array with config
+     */
+    protected function hasDsnString(array $config)
+    {
+        return isset($config['dsn']) && ! empty($config['dsn']);
+    }
+
+    private function connectWithDsnUrl(){
+
+        try {
+            $this->connection = new Client($this->config['dsn']);
+
+        } catch (\MongoDB\Driver\Exception\AuthenticationException $e) {
+            echo "AuthenticationException: ", $e->getMessage(), "\n";
+        } catch (\MongoDB\Driver\Exception\ConnectionException $e) {
+            echo "ConnectionException: ", $e->getMessage(), "\n";
+        } catch (\MongoDB\Driver\Exception\ConnectionTimeoutException $e) {
+            echo "ConnectionTimeoutException: ", $e->getMessage(), "\n";
+        } catch (\MongoDB\Driver\Exception\Exception $e) {
+            echo "Exception: ", $e->getMessage(), "\n";
+        }
+
+        return $this;
+    }
+
+    private function connectWithHost(){
 
         $dsn = "mongodb://";
+
 
         if(is_array($this->config['host'])) {
             $hosts = $this->config['host'];
             $list = [];
 
             foreach($hosts as $host) {
-                array_push($list, trim($host['address']) . ':' . $host['port']);
+                if($this->defaultConfig) {
+                    array_push($list, trim($host['address']) . ':' . $host['port']);
+                } else {
+                    array_push($list, trim($host) . ':' . $this->config['port']);
+                }
             }
 
             $dsn .= implode(",", $list);
@@ -88,7 +145,6 @@ class MongoClient {
         }
 
         try {
-
             $this->connection = new Client($dsn, $this->options);
 
         } catch (\MongoDB\Driver\Exception\AuthenticationException $e) {

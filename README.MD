@@ -1,6 +1,10 @@
 
 # Laravel MongoDB GridFS
 
+[![Latest Stable Version](https://poser.pugx.org/mts88/mongogrid/v/stable)](https://packagist.org/packages/mts88/mongogrid)
+[![Total Downloads](https://poser.pugx.org/mts88/mongogrid/downloads)](https://packagist.org/packages/mts88/mongogrid)
+[![License](https://poser.pugx.org/mts88/mongogrid/license)](https://packagist.org/packages/mts88/mongogrid)
+
 A library wants to help the use of GridFS of MongoDB for Laravel 5. _This library extends the original [MongoDB GridFS Bucket for PHP](https://docs.mongodb.com/php-library/current/reference/class/MongoDBGridFSBucket/), so many methods are exactly the same and others are simplified for the use._
 
 #### Note
@@ -22,8 +26,8 @@ This is not a library for Eloquent or somenthing like this. It's a simple helper
 
 | Laravel | Package |
 |--|--|
-| < 5.5.x | 1.0.x (not tested) |
-| >= 5.5.x | 1.0.x |
+| < 5.5.x | 1.1.x (not tested) |
+| >= 5.5.x | 1.1.x |
 
 ### Requirements
 Make sure you have the MongoDB PHP driver installed. You can find installation instructions at [http://php.net/manual/en/mongodb.installation.php](http://php.net/manual/en/mongodb.installation.php)
@@ -47,8 +51,12 @@ Run the command below to publish the package config file  `config/gridfs.php`:
 php artisan vendor:publish
 ```
 ### MongoDB Connection
+You can use build-in configuration in `config/gridfs.php` or you can use `config/database.php` (compatible with [jenssegers/laravel-mongodb](https://github.com/jenssegers/laravel-mongodb)).
+
+#### Connection with config/gridfs.php
+
 In config file `config/gridfs.php` set up your configuration in order to connect to MongoDB:
-#### Simple Connection
+##### Simple Connection
 ```php
     'db_config' => [
         'host'     => env('DB_HOST', 'localhost'),
@@ -61,7 +69,7 @@ In config file `config/gridfs.php` set up your configuration in order to connect
         ]
     ],
 ```
-#### ReplicaSet Connection
+##### ReplicaSet Connection
 In your `.env` file add `DB_REPLICA_SET` property with the name of Replica Set
 ```php
     'db_config' => [
@@ -84,6 +92,59 @@ In your `.env` file add `DB_REPLICA_SET` property with the name of Replica Set
         ]
     ],
 ```
+#### Connection with config/database.php
+
+In config file `config/gridfs.php` set up your configuration name:
+```php
+'db_config' => env('DB_CONNECTION', 'mongodb'),
+```
+
+In config file `config/database.php` set up your configuration in order to connect to MongoDB:
+And add a new mongodb connection:
+
+##### Simple Connection
+```php
+'mongodb' => [
+    'driver'   => 'mongodb',
+    'host'     => env('DB_HOST', 'localhost'),
+    'port'     => env('DB_PORT', 27017),
+    'database' => env('DB_DATABASE'),
+    'username' => env('DB_USERNAME'),
+    'password' => env('DB_PASSWORD'),
+    'options'  => [
+        'database' => 'admin' // sets the authentication database required by mongo 3
+    ]
+],
+```
+##### ReplicaSet Connection
+You can connect to multiple servers or replica sets with the following configuration:
+
+```php
+'mongodb' => [
+    'driver'   => 'mongodb',
+    'host'     => ['server1', 'server2'],
+    'port'     => env('DB_PORT', 27017),
+    'database' => env('DB_DATABASE'),
+    'username' => env('DB_USERNAME'),
+    'password' => env('DB_PASSWORD'),
+    'options'  => [
+		'replicaSet' => 'replicaSetName'
+	]
+],
+```
+##### DSN URL
+Alternatively, you can use MongoDB connection string:
+
+```php
+'mongodb' => [
+    'driver'   => 'mongodb',
+    'dsn' => env('DB_DSN'),
+    'database' => env('DB_DATABASE'),
+],
+```
+
+Please refer to MongoDB official docs for its URI format: https://docs.mongodb.com/manual/reference/connection-string/
+
 #### Bucket Configuration
 This is the config for GridFS Bucket:
 ```php
