@@ -4,7 +4,7 @@
     "license": "MIT",    
     "version": "1.1.0",
     "keywords": [
-        "mongodb", "gridfs", "mongo", "grid", "laravel", "mongogrid", "storage", "file", "bucket"
+        "mongodb", "gridfs", "mongo", "grid", "laravel", "mongogrid", "storage", "file", "bucket", "database", "store", "documents"
     ],
     "type": "library",
     "require": {
