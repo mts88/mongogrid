@@ -133,11 +133,15 @@ class MongoClient {
             $dsn .= trim($this->config['host']) . ':' . $this->config['port'];
         }
 
+        if(!empty($this->config['username']) && !empty($this->config['password'])) {
         $this->options = [
             'username'          =>  $this->config['username'],
             'password'          =>  $this->config['password'],
             'db'                =>  $this->config['options']['database']
         ];
+        } else {
+            $this->options = [];
+        }
 
         // Add replicaSet name if is necessary
         if( isset($this->config['options']['replicaSet']) ) {
