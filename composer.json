@@ -2,7 +2,7 @@
     "name": "mts88/mongogrid",
     "description": "GridFS of MongoDB for Laravel",
     "license": "MIT",    
-    "version": "1.1.0",
+    "version": "1.2.0",
     "keywords": [
         "mongodb", "gridfs", "mongo", "grid", "laravel", "mongogrid", "storage", "file", "bucket", "database", "store", "documents"
     ],
